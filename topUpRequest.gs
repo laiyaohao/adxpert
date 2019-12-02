@@ -291,3 +291,8 @@ function sendTopUpRequest() {
       subsequentTopUp()
       }
 }
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+  .createMenu('Top up').addItem('Send Top Up Request', 'sendTopUpRequest').addToUi()
+}
