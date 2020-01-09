@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      tr:nth-child(even) {
+        background-color:#dddddd;
+      }
+    </style>
+  </head>
+  <body>
+    <h5>麻烦燕星帮忙开户</h5>
+    <?var counter = 0?>
+    
+    <?var values = tableValues?>
+    <table>
+      <tr>
+        <th> Date </th>
+        <th> BR id </th>
+        <th> Company Registered Name (EN) </th>
+        <th> 投放类型 </th>
+        <th> Advitiser Contact Person </th>
+        <th> Advertiser's Email </th>
+        <th> Main Website </th>
+        <th> China Company Registered Name </th>
+        <th> 统一社会信用代码 </th>
+        <th> Address in Chinese </th>
+        <th> Address in English </th>
+        <th> City </th>
+        <th> Province </th>
+        <th> Postal Code </th>
+        <th> FB Page Link </th>
+        <th> Websites to be advertised </th>
+        <th> Facebook APP ID </th>
+        <th> Timezone </th>
+        <th> No. of Ad Account </th>
+        <th> 营业执照 </th>
+      </tr>
+      <tr>
+      <?for(var r in values){?>
+        <?counter ++?>
+        <?if (counter == 21) {
+          break;
+        }
+        ?>
+        
+        <td><?=values[r]?></td>
+        
+      <?}?>
+      </tr>
+    </table>
+  </body>
+</html>
+
+
