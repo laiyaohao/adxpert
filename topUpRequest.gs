@@ -67,7 +67,8 @@ function firstTopUpRequest() {
    //if there are 3 or more rows, we attach excel sheet in the email.
     if (cheetahmessage.length >= 3) {
      
-     setTimeout(cheetahFirstTopUpUsingExcel(), 1000)
+     cheetahFirstTopUpUsingExcel()
+     Utilities.sleep(1000)
      //setTimeout is a default function that can be used, so that i can delay the sending of the email by 1000 milliseconds.
      //reason why i want to do that is explained in the notion documentation.
     }
@@ -75,17 +76,20 @@ function firstTopUpRequest() {
     //if it is less than 3 rows, ie 2 rows or less, we send email with text
     if (cheetahmessage.length < 3 && cheetahmessage.length > 0) {
       
-      setTimeout(cheetahFirstTopUpEmail(), 1000)
+      cheetahFirstTopUpEmail()
+      Utilities.sleep(1000)
     }
     
     
     //panda doesnt need any excel sheet, so it is okay to just send email
    if (pandamessage.length > 0) {
-    setTimeout(pandaTopUpRequest(), 1000)
+    pandaTopUpRequest() 
+    Utilities.sleep(1000)
    }
    //same as panda
    if (yinolinkmessage.length > 0) {
-    setTimeout(yinolinkTopUpRequest(), 1000)
+    yinolinkTopUpRequest()
+    Utilities.sleep(1000)
    }
    }
    
@@ -122,21 +126,25 @@ function subsequentTopUp() {
    
    //if there are 3 or more rows, we attach excel sheet in the email.
     if (cheetahmessage.length >= 3) {
-     setTimeout(cheetahReplyExcel(), 1000)
+     cheetahReplyExcel()
+     Utilities.sleep(1000)
     }
     
     //if it is less than 3 rows, ie 2 rows or less, we send email with text
     if (cheetahmessage.length < 3 && cheetahmessage.length > 0) {
-      setTimeout(cheetahReplyEmail(), 1000)
+      cheetahReplyEmail()
+      Utilities.sleep(1000)
     }
     
     //panda doesnt need any excel sheet, so it is okay to just send email
    if (pandamessage.length > 0) {
-    setTimeout(pandaTopUpRequest(), 1000)
+    pandaTopUpRequest()
+    Utilities.sleep(1000)
    }
    //same as panda
    if (yinolinkmessage.length > 0) {
-    setTimeout(yinolinkTopUpRequest(), 1000)
+    yinolinkTopUpRequest()
+    Utilities.sleep(1000)
    }
 }
    
