@@ -67,7 +67,34 @@ function firstTopUpRequest() {
    //if there are 3 or more rows, we attach excel sheet in the email.
     if (cheetahmessage.length >= 3) {
      
-     cheetahFirstTopUpUsingExcel()
+     var newsheet = SpreadsheetApp.create('充值模板_' + Utilities.formatDate(new Date(), "GMT+8", "ddMMyy")).getActiveSheet()
+  //create a new excel
+      newsheet.appendRow(header)
+      //add the header in
+      for (var u = 0; u < cheetahmessage.length; u++) {
+      newsheet.appendRow(cheetahmessage[u])
+      }
+      //add all the top up / withdrawal requests that belong to cheetah to the empty excel
+      var newexcel = newsheet.getParent()
+      var url = "https://docs.google.com/feeds/download/spreadsheets/Export?key=" + newexcel.getId() + "&exportFormat=xlsx";
+      var params = {
+        method      : "get",
+        headers     : {"Authorization": "Bearer " + ScriptApp.getOAuthToken()},
+        muteHttpExceptions: true
+      };
+      // above is making the exporting the excel 
+       var blob1 = UrlFetchApp.fetch(url,params).getBlob()
+       newsheet.setName('充值模板_' + Utilities.formatDate(new Date(), "GMT+8", "ddMMyy"))
+       blob1.setName(newsheet.getName() + ".xlsx");
+       
+       //above is renaming the excel and attaching it to the email
+       var emailsub = 'adxpert-Facebook-猎豹移动-账户管理-' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy")
+       MailApp.sendEmail(cheetahemailaddresses, emailsub, "燕星，麻烦转款/充值/扣减", {attachments: blob1})
+      for (var q = 0; q < sheet.getLastRow()-1; q++) {
+      if (statuscells[q] == '' && idcells[q] != '' && moneycells[q] != '' && decisioncells[q] != '' && resellercells[q] == 'cheetah') {
+      sheet.getRange(q+2, 1).setValue('top up sent to cheetah on ' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
+      }
+      }
      Utilities.sleep(1000)
      //setTimeout is a default function that can be used, so that i can delay the sending of the email by 1000 milliseconds.
      //reason why i want to do that is explained in the notion documentation.
@@ -76,19 +103,96 @@ function firstTopUpRequest() {
     //if it is less than 3 rows, ie 2 rows or less, we send email with text
     if (cheetahmessage.length < 3 && cheetahmessage.length > 0) {
       
-      cheetahFirstTopUpEmail()
+      var decisionarray = []
+      var lesserthan2 = []
+      for (var u = 0; u < cheetahmessage.length; u++) {
+        decisionarray.push(cheetahmessage[u][2])
+      /*if (decisioncells[u] == '2') {
+      var decision = '扣减'
+      cheetahmessage.push('麻烦为' + acctnumber + '扣减' + moneycells[u])
+      }*/
+      
+      }
+      for (; countofdetail < cheetahmessage.length; countofdetail ++) {
+      var acctnummber = cheetahmessage[countofdetail][0]
+      var amt2transfer = cheetahmessage[countofdetail][1]
+      if (decisionarray[countofdetail] == '1') {
+      lesserthan2.push('麻烦为' + cheetahmessage[countofdetail][0] + '充值' + cheetahmessage[countofdetail][1])
+      
+      }
+      if (decisionarray[countofdetail] == '2') {
+      lesserthan2.push('麻烦为' + cheetahmessage[countofdetail][0] + '扣减' + cheetahmessage[countofdetail][1])
+      
+      }
+      }
+      lesserthan2.join()
+      var emailsub = 'adxpert-Facebook-账户管理-' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy")
+      MailApp.sendEmail(cheetahemailaddresses, emailsub, lesserthan2)
+      for (var q = 0; q < sheet.getLastRow()-1; q++) {
+      if (statuscells[q] == '' && idcells[q] != '' && moneycells[q] != '' && decisioncells[q] != '' && resellercells[q] == 'cheetah') {
+      sheet.getRange(q+2, 1).setValue('top up sent to cheetah on ' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
+      }
+      }
       Utilities.sleep(1000)
     }
     
     
     //panda doesnt need any excel sheet, so it is okay to just send email
    if (pandamessage.length > 0) {
-    pandaTopUpRequest() 
+    var decisionarray = [] //creating an empty array for the decision of top up or withdraw
+      var pandarealmessage = [] //creating an array for the message to be sent to panda
+      for (var u = 0; u < pandamessage.length; u++) {
+        decisionarray.push(pandamessage[u][2])
+      } // append the decision number which are full of '1's and '2's
+      for (; countofdetail < pandamessage.length; countofdetail ++) { //for each top up / withdrawal for panda
+      if (decisionarray[countofdetail] == '1') {
+      pandarealmessage.push('麻烦为' + pandamessage[countofdetail][0] + '充值' + pandamessage[countofdetail][1])
+      // if its '1', append the message such that its 充值
+      }
+      if (decisionarray[countofdetail] == '2') {
+      pandarealmessage.push('麻烦为' + pandamessage[countofdetail][0] + '扣减' + pandamessage[countofdetail][1])
+      //if its '2', append the message such that its withdrawal
+      }
+      }
+      pandarealmessage.join() // join all the message together
+      var emailsub = 'adxpert-Pandamobo-Facebook-账户管理-' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy")
+      MailApp.sendEmail(pandaemailaddresses, emailsub, pandarealmessage)
+      
+      //filling the cells in excel sheet to show the top up is done
+      for (var q = 0; q < sheet.getLastRow()-1; q++) {
+      if (statuscells[q] == '' && idcells[q] != '' && moneycells[q] != '' && decisioncells[q] != '' && resellercells[q] == 'panda') {
+      sheet.getRange(q+2, 1).setValue('top up sent to panda on ' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
+      }
+      } 
     Utilities.sleep(1000)
    }
    //same as panda
    if (yinolinkmessage.length > 0) {
-    yinolinkTopUpRequest()
+    var decisionarray = []
+      var yinolinkrealmessage = []
+      for (var u = 0; u < yinolinkmessage.length; u++) {
+        decisionarray.push(yinolinkmessage[u][2])
+      
+      
+      }
+      for (; countofdetail < yinolinkmessage.length; countofdetail ++) {
+      if (decisionarray[countofdetail] == '1') {
+      yinolinkrealmessage.push('麻烦为' + yinolinkmessage[countofdetail][0] + '充值' + yinolinkmessage[countofdetail][1])
+      
+      }
+      if (decisionarray[countofdetail] == '2') {
+      yinolinkrealmessage.push('麻烦为' + yinolinkmessage[countofdetail][0] + '扣减' + yinolinkmessage[countofdetail][1])
+      
+      }
+      }
+      yinolinkrealmessage.join()
+      var emailsub = 'adxpert-Yinolink-账户管理-' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy")
+      MailApp.sendEmail(yinolinkemailaddresses, emailsub, yinolinkrealmessage)
+      for (var q = 0; q < sheet.getLastRow()-1; q++) {
+      if (statuscells[q] == '' && idcells[q] != '' && moneycells[q] != '' && decisioncells[q] != '' && resellercells[q] == 'yinolink') {
+      sheet.getRange(q+2, 1).setValue('top up sent to yinolink on ' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
+      }
+      }
     Utilities.sleep(1000)
    }
    }
@@ -126,24 +230,129 @@ function subsequentTopUp() {
    
    //if there are 3 or more rows, we attach excel sheet in the email.
     if (cheetahmessage.length >= 3) {
-     cheetahReplyExcel()
+     var newsheet = SpreadsheetApp.create('充值模板_' + Utilities.formatDate(new Date(), "GMT+8", "ddMMyy")).getActiveSheet()
+      newsheet.appendRow(header)
+      for (var u = 0; u < cheetahmessage.length; u++) {
+      newsheet.appendRow(cheetahmessage[u])
+      }
+      var newexcel = newsheet.getParent()
+      var url = "https://docs.google.com/feeds/download/spreadsheets/Export?key=" + newexcel.getId() + "&exportFormat=xlsx";
+      var params = {
+        method      : "get",
+        headers     : {"Authorization": "Bearer " + ScriptApp.getOAuthToken()},
+        muteHttpExceptions: true
+      };
+       var blob1 = UrlFetchApp.fetch(url,params).getBlob()
+       newsheet.setName('充值模板_' + Utilities.formatDate(new Date(), "GMT+8", "ddMMyy"))
+       blob1.setName(newsheet.getName() + ".xlsx");
+       
+       
+       var gmailquary = GmailApp.search('账户管理 ' + Utilities.formatDate(new Date(), "GMT+8", "ddMMyy") + '猎豹移动')
+       gmailquary[0].replyAll("燕星，麻烦转款/充值/扣减", {attachments: blob1})
+       
+       //above are the lines of code that replies the email
+      for (var q = 0; q < sheet.getLastRow()-1; q++) {
+      if (statuscells[q] == '' && idcells[q] != '' && moneycells[q] != '' && decisioncells[q] != '' && resellercells[q] == 'cheetah') {
+      sheet.getRange(q+2, 1).setValue('top up sent to cheetah on ' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
+      }
+      }
      Utilities.sleep(1000)
     }
     
     //if it is less than 3 rows, ie 2 rows or less, we send email with text
     if (cheetahmessage.length < 3 && cheetahmessage.length > 0) {
-      cheetahReplyEmail()
+      var decisionarray = []
+      var lesserthan2 = []
+      for (var u = 0; u < cheetahmessage.length; u++) {
+        decisionarray.push(cheetahmessage[u][2])
+      
+      
+      }
+      for (; countofdetail < cheetahmessage.length; countofdetail ++) {
+      var acctnummber = cheetahmessage[countofdetail][0]
+      var amt2transfer = cheetahmessage[countofdetail][1]
+      if (decisionarray[countofdetail] == '1') {
+      lesserthan2.push('麻烦为' + cheetahmessage[countofdetail][0] + '充值' + cheetahmessage[countofdetail][1])
+      
+      }
+      if (decisionarray[countofdetail] == '2') {
+      lesserthan2.push('麻烦为' + cheetahmessage[countofdetail][0] + '扣减' + cheetahmessage[countofdetail][1])
+      
+      }
+      }
+      lesserthan2.join()
+      //var emailsub = 'adxpert-Facebook-账户管理-' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy")
+      //MailApp.sendEmail(cheetahemailaddresses, emailsub, lesserthan2)
+      
+      var gmailquary = GmailApp.search('账户管理 ' + Utilities.formatDate(new Date(), "GMT+8", "ddMMyy") + ' haoyanxing')
+       gmailquary[0]
+       .replyAll(lesserthan2)
+      
+      //
+      for (var q = 0; q < sheet.getLastRow()-1; q++) {
+      if (statuscells[q] == '' && idcells[q] != '' && moneycells[q] != '' && decisioncells[q] != '' && resellercells[q] == 'cheetah') {
+      sheet.getRange(q+2, 1).setValue('top up sent to cheetah on ' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
+      }
+      }
       Utilities.sleep(1000)
     }
     
     //panda doesnt need any excel sheet, so it is okay to just send email
    if (pandamessage.length > 0) {
-    pandaTopUpRequest()
+    var decisionarray = [] //creating an empty array for the decision of top up or withdraw
+      var pandarealmessage = [] //creating an array for the message to be sent to panda
+      for (var u = 0; u < pandamessage.length; u++) {
+        decisionarray.push(pandamessage[u][2])
+      } // append the decision number which are full of '1's and '2's
+      for (; countofdetail < pandamessage.length; countofdetail ++) { //for each top up / withdrawal for panda
+      if (decisionarray[countofdetail] == '1') {
+      pandarealmessage.push('麻烦为' + pandamessage[countofdetail][0] + '充值' + pandamessage[countofdetail][1])
+      // if its '1', append the message such that its 充值
+      }
+      if (decisionarray[countofdetail] == '2') {
+      pandarealmessage.push('麻烦为' + pandamessage[countofdetail][0] + '扣减' + pandamessage[countofdetail][1])
+      //if its '2', append the message such that its withdrawal
+      }
+      }
+      pandarealmessage.join() // join all the message together
+      var emailsub = 'adxpert-Pandamobo-Facebook-账户管理-' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy")
+      MailApp.sendEmail(pandaemailaddresses, emailsub, pandarealmessage)
+      
+      //filling the cells in excel sheet to show the top up is done
+      for (var q = 0; q < sheet.getLastRow()-1; q++) {
+      if (statuscells[q] == '' && idcells[q] != '' && moneycells[q] != '' && decisioncells[q] != '' && resellercells[q] == 'panda') {
+      sheet.getRange(q+2, 1).setValue('top up sent to panda on ' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
+      }
+      }
     Utilities.sleep(1000)
    }
    //same as panda
    if (yinolinkmessage.length > 0) {
-    yinolinkTopUpRequest()
+    var decisionarray = []
+      var yinolinkrealmessage = []
+      for (var u = 0; u < yinolinkmessage.length; u++) {
+        decisionarray.push(yinolinkmessage[u][2])
+      
+      
+      }
+      for (; countofdetail < yinolinkmessage.length; countofdetail ++) {
+      if (decisionarray[countofdetail] == '1') {
+      yinolinkrealmessage.push('麻烦为' + yinolinkmessage[countofdetail][0] + '充值' + yinolinkmessage[countofdetail][1])
+      
+      }
+      if (decisionarray[countofdetail] == '2') {
+      yinolinkrealmessage.push('麻烦为' + yinolinkmessage[countofdetail][0] + '扣减' + yinolinkmessage[countofdetail][1])
+      
+      }
+      }
+      yinolinkrealmessage.join()
+      var emailsub = 'adxpert-Yinolink-账户管理-' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy")
+      MailApp.sendEmail(yinolinkemailaddresses, emailsub, yinolinkrealmessage)
+      for (var q = 0; q < sheet.getLastRow()-1; q++) {
+      if (statuscells[q] == '' && idcells[q] != '' && moneycells[q] != '' && decisioncells[q] != '' && resellercells[q] == 'yinolink') {
+      sheet.getRange(q+2, 1).setValue('top up sent to yinolink on ' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
+      }
+      }
     Utilities.sleep(1000)
    }
 }
@@ -169,7 +378,7 @@ function onOpen() {
 function pandaTopUpRequest() {
   var decisionarray = [] //creating an empty array for the decision of top up or withdraw
       var pandarealmessage = [] //creating an array for the message to be sent to panda
-      for (; u < pandamessage.length; u++) {
+      for (var u = 0; u < pandamessage.length; u++) {
         decisionarray.push(pandamessage[u][2])
       } // append the decision number which are full of '1's and '2's
       for (; countofdetail < pandamessage.length; countofdetail ++) { //for each top up / withdrawal for panda
@@ -198,7 +407,7 @@ function yinolinkTopUpRequest() { //all of them same as panda
 
       var decisionarray = []
       var yinolinkrealmessage = []
-      for (; u < yinolinkmessage.length; u++) {
+      for (var u = 0; u < yinolinkmessage.length; u++) {
         decisionarray.push(yinolinkmessage[u][2])
       
       
@@ -228,7 +437,7 @@ function cheetahFirstTopUpUsingExcel() {
   //create a new excel
       newsheet.appendRow(header)
       //add the header in
-      for (; u < cheetahmessage.length; u++) {
+      for (var u = 0; u < cheetahmessage.length; u++) {
       newsheet.appendRow(cheetahmessage[u])
       }
       //add all the top up / withdrawal requests that belong to cheetah to the empty excel
@@ -258,7 +467,7 @@ function cheetahFirstTopUpEmail() { //roughly the same as yinolink and panda
   //var emailsub = 'adxpert-Facebook-账户管理-' + Utilities.formatDate(new Date(), "GMT+8","ddMMyy")
       var decisionarray = []
       var lesserthan2 = []
-      for (; u < cheetahmessage.length; u++) {
+      for (var u = 0; u < cheetahmessage.length; u++) {
         decisionarray.push(cheetahmessage[u][2])
       /*if (decisioncells[u] == '2') {
       var decision = '扣减'
@@ -291,7 +500,7 @@ function cheetahFirstTopUpEmail() { //roughly the same as yinolink and panda
 function cheetahReplyExcel() { //same as sending the excel the first time, except of sending the email, we are replying the email
   var newsheet = SpreadsheetApp.create('充值模板_' + Utilities.formatDate(new Date(), "GMT+8", "ddMMyy")).getActiveSheet()
       newsheet.appendRow(header)
-      for (; u < cheetahmessage.length; u++) {
+      for (var u = 0; u < cheetahmessage.length; u++) {
       newsheet.appendRow(cheetahmessage[u])
       }
       var newexcel = newsheet.getParent()
@@ -321,7 +530,7 @@ function cheetahReplyEmail() { //same as replying the email with the excel sheet
   
       var decisionarray = []
       var lesserthan2 = []
-      for (; u < cheetahmessage.length; u++) {
+      for (var u = 0; u < cheetahmessage.length; u++) {
         decisionarray.push(cheetahmessage[u][2])
       
       
