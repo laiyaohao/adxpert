@@ -44,7 +44,11 @@ function firstTopUpRequest() {
     
     //creating 3 variables for the 3 resellers and equating them to empty arrays
     //the idea is to fill up the arrays with the code below and send them to respective resellers
-  for (; i<sheet.getLastRow()-1; i++) {
+    var numberOfRows = 0
+    while (idcells[numberOfRows] != '') {
+      numberOfRows ++
+    }
+  for (; i<=numberOfRows; i++) {
   
   // if reseller is cheetah:
   
@@ -211,7 +215,11 @@ function subsequentTopUp() {
     }*/
     // u is the row number.
     var yinolinkmessage = []
-  for (; i<sheet.getLastRow()-1; i++) {
+    var numberOfRows = 0
+    while (idcells[numberOfRows] != '') {
+      numberOfRows ++
+    }
+  for (; i<=numberOfRows; i++) {
   
   // if reseller is cheetah:
   
