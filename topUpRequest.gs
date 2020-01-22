@@ -1,6 +1,6 @@
-var ss = SpreadsheetApp.getActiveSpreadsheet()
-ss.setActiveSheet(ss.getSheetByName('Top Up Function'))
-var sheet = SpreadsheetApp.getActiveSheet()
+//var ss = SpreadsheetApp.getActiveSpreadsheet()
+//ss.setActiveSheet(ss.getSheetByName('Top Up Function'))
+var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Top Up Function')
 
 // the first line basically means getting the get the active spreadsheet, which is the current spreadsheet
 // as fpr the second line, i set the top up function as the active sheet
@@ -45,10 +45,11 @@ function firstTopUpRequest() {
     //creating 3 variables for the 3 resellers and equating them to empty arrays
     //the idea is to fill up the arrays with the code below and send them to respective resellers
     var numberOfRows = 0
-    while (idcells[numberOfRows] != '') {
+   
+  while (resellercells[numberOfRows] == 'cheetah' || resellercells[numberOfRows] == 'panda' || resellercells[numberOfRows] == 'yinolink') {
       numberOfRows ++
     }
-  for (; i<=numberOfRows; i++) {
+  for (; i <= numberOfRows; i++) {
   
   // if reseller is cheetah:
   
@@ -216,10 +217,10 @@ function subsequentTopUp() {
     // u is the row number.
     var yinolinkmessage = []
     var numberOfRows = 0
-    while (idcells[numberOfRows] != '') {
+    while (resellercells[numberOfRows] == 'cheetah' || resellercells[numberOfRows] == 'panda' || resellercells[numberOfRows] == 'yinolink') {
       numberOfRows ++
     }
-  for (; i<=numberOfRows; i++) {
+  for (; i<= numberOfRows; i++) {
   
   // if reseller is cheetah:
   
