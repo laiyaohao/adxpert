@@ -45,6 +45,7 @@ function generateInvoice() {
         
       })
       invoiceDoc.getBody().appendParagraph(adxpertLogo); //sometimes can work, sometimes cannot work for images
+      DriveApp.getFilesByName(invoiceNumberCells[i]).next().moveTo(DriveApp.getFoldersByName("adXpert Invoices").next()); 
       sheet.getRange(i+2,1).setValue("Invoice Generated on " + Utilities.formatDate(new Date(), "GMT+8","ddMMyy"))
     }
   }
